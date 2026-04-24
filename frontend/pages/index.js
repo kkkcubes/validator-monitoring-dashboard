@@ -8,10 +8,11 @@ export default function Home() {
   const [metrics, setMetrics] = useState({});
   const [history, setHistory] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [activeTab, setActiveTab] = useState("metrics"); // ✅ NEW
+  const [activeTab, setActiveTab] = useState("metrics");
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    // ✅ FIXED URL
+    const socket = io("https://validator-monitoring-dashboard.onrender.com");
 
     socket.on("update", (data) => {
       setValidators(data.validators);
@@ -25,7 +26,7 @@ export default function Home() {
     });
 
     return () => {
-      socket.disconnect(); // 🔥 cleanup
+      socket.disconnect();
     };
   }, []);
 
@@ -49,10 +50,9 @@ export default function Home() {
       <div style={{ flex: 1, padding: 20 }}>
         <h1>Validator Monitoring</h1>
 
-        {/* 👇 Debug / indicator */}
         <p style={{ color: "gray" }}>Active Tab: {activeTab}</p>
 
-        {/* 🔥 Alerts */}
+        {/* Alerts */}
         {alerts.map((a, i) => (
           <div
             key={i}
@@ -68,29 +68,26 @@ export default function Home() {
           </div>
         ))}
 
-        {/* ✅ Metrics Tab */}
+        {/* Metrics Tab */}
         {activeTab === "metrics" && (
           <div>
             <h2>Metrics</h2>
 
-            {/* Metrics Cards */}
             <div style={{ display: "flex", gap: 20 }}>
               <Card title="Uptime" value={`${metrics.uptime}%`} />
               <Card title="TPS" value={metrics.tps} />
               <Card title="Latency" value={`${metrics.latency} ms`} />
             </div>
 
-            {/* Charts */}
             <h3>TPS History</h3>
             <Charts data={history} />
 
-            {/* Heatmap */}
             <h3>Latency Heatmap</h3>
             <Heatmap validators={validators} />
           </div>
         )}
 
-        {/* ✅ Validators Tab */}
+        {/* Validators Tab */}
         {activeTab === "validators" && (
           <div>
             <h2>Validators</h2>
